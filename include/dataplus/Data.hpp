@@ -21,9 +21,12 @@
 #define __DATAPLUS_DATA_HPP__
 
 #include <functional>
+#include <map>
 #include <string>
+#include <vector>
 
 #include <boost/any.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "Dataplus.hpp"
 
@@ -53,6 +56,15 @@ public:
 	};
 
 	Data();
+	Data(const bool input);
+	Data(const boost::posix_time::ptime &input);
+	Data(const double input);
+	Data(const int input);
+	Data(const std::map<string, Data> &input);
+	Data(const char *input);
+	Data(const string &input);
+	Data(const std::vector<Data> &input);
+	Data(const std::initializer_list<Data> &input);
 
 	Data& operator[](const string &key) const;
 	Data& operator[](const int &index) const;

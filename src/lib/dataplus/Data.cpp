@@ -29,6 +29,62 @@ Data::Data() :
 {
 }
 
+Data::Data(const bool input) :
+	_type(Type::BOOLEAN),
+	_data(input)
+{
+}
+
+Data::Data(const boost::posix_time::ptime &input) :
+	_type(Type::DATE),
+	_data(input)
+{
+}
+
+Data::Data(const double input) :
+	_type(Type::DOUBLE),
+	_data(input)
+{
+}
+
+Data::Data(const int input) :
+	_type(Type::INT),
+	_data(input)
+{
+}
+
+Data::Data(const std::map<string, Data> &input) :
+	_type(Type::MAP),
+	_data(input)
+{
+}
+
+Data::Data(const char *input) :
+	_type(Type::STRING),
+	_data(string(input))
+{
+}
+
+Data::Data(const string &input) :
+	_type(Type::STRING),
+	_data(input)
+{
+}
+
+Data::Data(const std::vector<Data> &input) :
+	_type(Type::VECTOR),
+	_data(input)
+{
+}
+
+Data::Data(const std::initializer_list<Data> &input) :
+	_type(Type::VECTOR)
+{
+	std::vector<Data> inputTmp;
+	inputTmp.insert(inputTmp.end(), input.begin(), input.end());
+	_data = inputTmp;
+}
+
 Data& Data::operator[](const string &key) const
 {
 	if (_data.type() == typeid(std::map<string, Data>)) {

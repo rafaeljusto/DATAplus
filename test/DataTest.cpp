@@ -17,8 +17,11 @@
   along with DATAplus.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <map>
 #include <string>
+#include <vector>
 
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <dataplus/Data.hpp>
@@ -36,6 +39,40 @@ using dataplus::Data;
 #include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(dataplusTests)
+
+BOOST_AUTO_TEST_CASE(implicitConstructorMustWork)
+{
+	Data data1 = true;
+	BOOST_CHECK_EQUAL(data1.get<bool>(), true);
+
+	Data data2 = 1.1;
+	BOOST_CHECK_EQUAL(data2.get<double>(), 1.1);
+
+	Data data3 = 1;
+	BOOST_CHECK_EQUAL(data3.get<int>(), 1);
+
+	typedef std::map<string, Data> map;
+
+	map input4;
+	Data data4 = input4;
+	//BOOST_CHECK_EQUAL(data4.get<map>(), input4);
+
+	Data data5 = "abc123";
+	BOOST_CHECK_EQUAL(data5.get<string>(), "abc123");
+
+	Data data6 = string("abc123");
+	BOOST_CHECK_EQUAL(data6.get<string>(), "abc123");
+
+	std::vector<Data> input7;
+	Data data7 = input7;
+	//BOOST_CHECK_EQUAL(data7.get<std::vector<Data> >(), input7);
+
+	Data data8 = { "array ", "of ", 4, " elements" };
+
+	Data data9 = boost::posix_time::time_from_string("2012-07-08");
+	BOOST_CHECK_EQUAL(data9.get<boost::posix_time::ptime>(), 
+	                  boost::posix_time::time_from_string("2012-07-08"));
+}
 
 BOOST_AUTO_TEST_CASE(mustImportDataCorrectly)
 {

@@ -89,7 +89,7 @@ if (verbose == "0"):
 # Libraries
 
 libraries = {
-    "DATAPLUS" : ["dataplus"]
+    "DATAPLUS" : ["dataplus", "boost_date_time"]
     }
 
 def getLibraries(names):
