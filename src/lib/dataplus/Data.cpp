@@ -24,6 +24,30 @@
 
 DATAPLUS_NS_BEGIN
 
+string Data::Type::toString(const Value type)
+{
+	switch(type) {
+	case BOOLEAN:
+		return "boolean";
+	case DATE:
+		return "date";
+	case DOUBLE:
+		return "double";
+	case INT:
+		return "int";
+	case MAP:
+		return "map";
+	case NONE:
+		return "none";
+	case STRING:
+		return "string";
+	case VECTOR:
+		return "vector";
+	}
+
+	return "";
+}
+
 Data::Data() :
 	_type(Type::NONE)
 {
@@ -85,13 +109,52 @@ Data::Data(const std::initializer_list<Data> &input) :
 	_data = inputTmp;
 }
 
+bool Data::operator==(const Data &other) const
+{
+	if (_type != other._type) {
+		return false;
+	}
+
+	switch(_type) {
+	case Data::Type::BOOLEAN:
+		return boost::any_cast<bool>(_data) == boost::any_cast<bool>(other._data);
+	case Data::Type::DATE:
+		return boost::any_cast<boost::posix_time::ptime>(_data) == 
+			boost::any_cast<boost::posix_time::ptime>(other._data);
+	case Data::Type::DOUBLE:
+		return boost::any_cast<double>(_data) == 
+			boost::any_cast<double>(other._data);
+	case Data::Type::INT:
+		return boost::any_cast<int>(_data) == boost::any_cast<int>(other._data);
+	case Data::Type::MAP:
+		return boost::any_cast<std::map<string, Data> >(_data) == 
+			boost::any_cast<std::map<string, Data> >(other._data);
+	case Data::Type::NONE:
+		return true;
+	case Data::Type::STRING:
+		return boost::any_cast<string>(_data) == 
+			boost::any_cast<string>(other._data);
+	case Data::Type::VECTOR:
+		return boost::any_cast<std::vector<Data> >(_data) == 
+			boost::any_cast<std::vector<Data> >(other._data);
+	}
+
+	return false;
+}
+
+bool Data::operator!=(const Data &other) const
+{
+	return !(*this == other);
+}
+
 Data& Data::operator[](const string &key) const
 {
 	if (_data.type() == typeid(std::map<string, Data>)) {
 		return boost::any_cast<std::map<string, Data> >(_data)[key];
 	}
 
-	throw; // TODO
+	throw std::runtime_error("Expected mapped object but found " + 
+	                         Data::Type::toString(_type) + " object");
 }
 
 Data& Data::operator[](const int &index) const
@@ -100,7 +163,8 @@ Data& Data::operator[](const int &index) const
 		return boost::any_cast<std::vector<Data> >(_data)[index];
 	}
 
-	throw; // TODO
+	throw std::runtime_error("Expected vector object but found " + 
+	                         Data::Type::toString(_type) + " object");
 }
 
 void Data::importData(const string &data, const Encoder &encoder)

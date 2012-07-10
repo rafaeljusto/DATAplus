@@ -17,20 +17,16 @@
   along with DATAplus.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __DATAPLUS_DATAPLUS_H__
-#define __DATAPLUS_DATAPLUS_H__
+#ifndef __DATAPLUS_ENCODERS_JSON_HPP__
+#define __DATAPLUS_ENCODERS_JSON_HPP__
 
-/*! \mainpage DATAplus
- *
- * To avoid duplicated documentation you can check \b README.md file
- * in project root directory or \b features.txt and \b examples.txt
- * files in doc directory.
- */
+#include <dataplus/Data.hpp>
+#include <dataplus/Dataplus.hpp>
 
-#define DATAPLUS_NS_BEGIN namespace dataplus {
-#define DATAPLUS_ENCODER_NS_BEGIN DATAPLUS_NS_BEGIN namespace encoders {
+DATAPLUS_ENCODER_NS_BEGIN
 
-#define DATAPLUS_NS_END }
-#define DATAPLUS_ENCODER_NS_END DATAPLUS_NS_END }
+dataplus::Data encode(const string &input);
 
-#endif // __DATAPLUS_DATAPLUS_H__
+DATAPLUS_ENCODER_NS_END
+
+#endif // __DATAPLUS_ENCODERS_JSON_HPP__

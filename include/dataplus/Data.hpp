@@ -53,6 +53,8 @@ public:
 			STRING,
 			VECTOR
 		};
+
+		static string toString(const Value type);
 	};
 
 	Data();
@@ -66,6 +68,8 @@ public:
 	Data(const std::vector<Data> &input);
 	Data(const std::initializer_list<Data> &input);
 
+	bool operator==(const Data &other) const;
+	bool operator!=(const Data &other) const;
 	Data& operator[](const string &key) const;
 	Data& operator[](const int &index) const;
 
@@ -84,6 +88,10 @@ public:
 	template<class T>
 	T get() const
 	{
+		if (_data.empty()) {
+			throw std::runtime_error("No data");
+		}
+
 		return boost::any_cast<T>(_data);
 	}
 

@@ -24,7 +24,7 @@ sys.path.append(basePath + "/install")
 import installer
 
 dataplusName = localLibraryInstall + "/" + os.getcwd().split("/")[-1]
-dataplusLib = env.StaticLibrary(dataplusName, Glob("*.cpp"))
+dataplusLib = env.StaticLibrary(dataplusName, Glob("*.cpp") + Glob("encoders/*.cpp"))
 
 opts = Variables(basePath + "/conf/dataplus.conf", ARGUMENTS)
 installer.AddOptions(opts)

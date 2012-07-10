@@ -53,9 +53,8 @@ BOOST_AUTO_TEST_CASE(implicitConstructorMustWork)
 
 	typedef std::map<string, Data> map;
 
-	map input4;
-	Data data4 = input4;
-	//BOOST_CHECK_EQUAL(data4.get<map>(), input4);
+	Data data4 = map();
+	BOOST_CHECK(data4.get<map>() == map());
 
 	Data data5 = "abc123";
 	BOOST_CHECK_EQUAL(data5.get<string>(), "abc123");
@@ -63,15 +62,31 @@ BOOST_AUTO_TEST_CASE(implicitConstructorMustWork)
 	Data data6 = string("abc123");
 	BOOST_CHECK_EQUAL(data6.get<string>(), "abc123");
 
-	std::vector<Data> input7;
-	Data data7 = input7;
-	//BOOST_CHECK_EQUAL(data7.get<std::vector<Data> >(), input7);
+	Data data7 = std::vector<Data>();
+	BOOST_CHECK(data7.get<std::vector<Data> >() == std::vector<Data>());
 
-	Data data8 = { "array ", "of ", 4, " elements" };
-
-	Data data9 = boost::posix_time::time_from_string("2012-07-08");
-	BOOST_CHECK_EQUAL(data9.get<boost::posix_time::ptime>(), 
+	Data data8 = boost::posix_time::time_from_string("2012-07-08");
+	BOOST_CHECK_EQUAL(data8.get<boost::posix_time::ptime>(), 
 	                  boost::posix_time::time_from_string("2012-07-08"));
+}
+
+BOOST_AUTO_TEST_CASE(mustAcceptInitializerList)
+{
+	Data data = { "array ", "of ", 4, " elements" };
+
+	std::vector<Data> list;
+	list.push_back(Data("array "));
+	list.push_back(Data("of "));
+	list.push_back(Data(4));
+	list.push_back(Data(" elements"));
+
+	BOOST_CHECK(data.get<std::vector<Data> >() == list);
+}
+
+BOOST_AUTO_TEST_CASE(retrieveUninitializedData)
+{
+	Data data;
+	BOOST_CHECK_THROW(data.get<int>(), std::runtime_error);
 }
 
 BOOST_AUTO_TEST_CASE(mustImportDataCorrectly)
