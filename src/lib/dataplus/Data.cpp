@@ -118,22 +118,29 @@ bool Data::operator==(const Data &other) const
 	switch(_type) {
 	case Data::Type::BOOLEAN:
 		return boost::any_cast<bool>(_data) == boost::any_cast<bool>(other._data);
+
 	case Data::Type::DATE:
 		return boost::any_cast<boost::posix_time::ptime>(_data) == 
 			boost::any_cast<boost::posix_time::ptime>(other._data);
+
 	case Data::Type::DOUBLE:
 		return boost::any_cast<double>(_data) == 
 			boost::any_cast<double>(other._data);
+
 	case Data::Type::INT:
 		return boost::any_cast<int>(_data) == boost::any_cast<int>(other._data);
+
 	case Data::Type::MAP:
 		return boost::any_cast<std::map<string, Data> >(_data) == 
 			boost::any_cast<std::map<string, Data> >(other._data);
+
 	case Data::Type::NONE:
 		return true;
+
 	case Data::Type::STRING:
 		return boost::any_cast<string>(_data) == 
 			boost::any_cast<string>(other._data);
+
 	case Data::Type::VECTOR:
 		return boost::any_cast<std::vector<Data> >(_data) == 
 			boost::any_cast<std::vector<Data> >(other._data);
@@ -177,14 +184,59 @@ string Data::exportData(const Decoder &decoder)
 	return decoder(*this);
 }
 
-void Data::setType(const Type::Value type)
-{
-	_type = type;
-}
-
-Data::Type::Value Data::getType() const
+Data::Type::Value Data::type() const
 {
 	return _type;
+}
+
+std::size_t Data::size() const
+{
+	switch(_type) {
+	case Data::Type::BOOLEAN:
+	case Data::Type::DATE:
+	case Data::Type::DOUBLE:
+	case Data::Type::INT:
+		return -1;
+
+	case Data::Type::MAP:
+		return boost::any_cast<std::map<string, Data> >(_data).size();
+
+	case Data::Type::NONE:
+		return -1;
+
+	case Data::Type::STRING:
+		return boost::any_cast<string>(_data).size();
+
+	case Data::Type::VECTOR:
+		return boost::any_cast<std::vector<Data> >(_data).size();
+	}
+
+	return -1;
+}
+
+bool Data::empty() const
+{
+	switch(_type) {
+	case Data::Type::BOOLEAN:
+	case Data::Type::DATE:
+	case Data::Type::DOUBLE:
+	case Data::Type::INT:
+		return false;
+
+	case Data::Type::MAP:
+		return boost::any_cast<std::map<string, Data> >(_data).empty();
+
+	case Data::Type::NONE:
+		return true;
+
+	case Data::Type::STRING:
+		return boost::any_cast<string>(_data).empty();
+
+	case Data::Type::VECTOR:
+		return boost::any_cast<std::vector<Data> >(_data).empty();
+	}
+
+	return true;
 }
 
 DATAPLUS_NS_END

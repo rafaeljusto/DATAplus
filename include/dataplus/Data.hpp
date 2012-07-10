@@ -76,8 +76,9 @@ public:
 	void importData(const string &data, const Encoder &encoder);
 	string exportData(const Decoder &decoder);
 
-	void setType(const Type::Value type);
-	Type::Value getType() const;
+	Type::Value type() const;
+	std::size_t size() const;
+	bool empty() const;
 
 	template<class T>
 	void set(const T &data)
@@ -88,7 +89,7 @@ public:
 	template<class T>
 	T get() const
 	{
-		if (_data.empty()) {
+		if (_data.empty() || _type == Type::NONE) {
 			throw std::runtime_error("No data");
 		}
 

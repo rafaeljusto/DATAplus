@@ -93,13 +93,10 @@ BOOST_AUTO_TEST_CASE(mustImportDataCorrectly)
 {
 	Data data;
 	data.importData("1", [](const string &input) {
-			Data data;
-			data.setType(Data::Type::INT);
-			data.set<int>(boost::lexical_cast<int>(input));
-			return data;
+			return Data(boost::lexical_cast<int>(input));
 		});
 
-	BOOST_CHECK_EQUAL(data.getType(), Data::Type::INT);
+	BOOST_CHECK_EQUAL(data.type(), Data::Type::INT);
 	BOOST_CHECK_EQUAL(data.get<int>(), 1);
 }
 
@@ -107,15 +104,11 @@ BOOST_AUTO_TEST_CASE(mustExportDataCorrectly)
 {
 	Data data;
 	data.importData("1", [](const string &input) {
-			Data data;
-			data.setType(Data::Type::INT);
-			data.set<int>(boost::lexical_cast<int>(input));
-			return data;
+			return Data(boost::lexical_cast<int>(input));
 		});
 
 	string output = data.exportData([](const Data &data) {
-			int output = data.get<int>();
-			return boost::lexical_cast<string>(output);
+			return boost::lexical_cast<string>(data.get<int>());
 		});
 
 	BOOST_CHECK_EQUAL(output, "1");
