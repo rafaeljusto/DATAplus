@@ -20,6 +20,8 @@
 #include <map>
 #include <vector>
 
+#include <boost/lexical_cast.hpp>
+
 #include <dataplus/Data.hpp>
 
 DATAPLUS_NS_BEGIN
@@ -120,29 +122,29 @@ bool Data::operator==(const Data &other) const
 		return boost::any_cast<bool>(_data) == boost::any_cast<bool>(other._data);
 
 	case Data::Type::DATE:
-		return boost::any_cast<boost::posix_time::ptime>(_data) == 
+		return boost::any_cast<boost::posix_time::ptime>(_data) ==
 			boost::any_cast<boost::posix_time::ptime>(other._data);
 
 	case Data::Type::DOUBLE:
-		return boost::any_cast<double>(_data) == 
+		return boost::any_cast<double>(_data) ==
 			boost::any_cast<double>(other._data);
 
 	case Data::Type::INT:
 		return boost::any_cast<int>(_data) == boost::any_cast<int>(other._data);
 
 	case Data::Type::MAP:
-		return boost::any_cast<std::map<string, Data> >(_data) == 
+		return boost::any_cast<std::map<string, Data> >(_data) ==
 			boost::any_cast<std::map<string, Data> >(other._data);
 
 	case Data::Type::NONE:
 		return true;
 
 	case Data::Type::STRING:
-		return boost::any_cast<string>(_data) == 
+		return boost::any_cast<string>(_data) ==
 			boost::any_cast<string>(other._data);
 
 	case Data::Type::VECTOR:
-		return boost::any_cast<std::vector<Data> >(_data) == 
+		return boost::any_cast<std::vector<Data> >(_data) ==
 			boost::any_cast<std::vector<Data> >(other._data);
 	}
 
@@ -160,7 +162,7 @@ Data& Data::operator[](const string &key) const
 		return boost::any_cast<std::map<string, Data> >(_data)[key];
 	}
 
-	throw std::runtime_error("Expected mapped object but found " + 
+	throw std::runtime_error("Expected mapped object but found " +
 	                         Data::Type::toString(_type) + " object");
 }
 
@@ -170,7 +172,7 @@ Data& Data::operator[](const int &index) const
 		return boost::any_cast<std::vector<Data> >(_data)[index];
 	}
 
-	throw std::runtime_error("Expected vector object but found " + 
+	throw std::runtime_error("Expected vector object but found " +
 	                         Data::Type::toString(_type) + " object");
 }
 
@@ -237,6 +239,215 @@ bool Data::empty() const
 	}
 
 	return true;
+}
+
+bool Data::isBoolean() const
+{
+	return _type == Type::BOOLEAN;
+}
+
+bool Data::isDate() const
+{
+	return _type == Type::DATE;
+}
+
+bool Data::isDouble() const
+{
+	return _type == Type::DOUBLE;
+}
+
+bool Data::isInt() const
+{
+	return _type == Type::INT;
+}
+
+bool Data::isMap() const
+{
+	return _type == Type::MAP;
+}
+
+bool Data::isNone() const
+{
+	return _type == Type::NONE;
+}
+
+bool Data::isString() const
+{
+	return _type == Type::STRING;
+}
+
+bool Data::isVector() const
+{
+	return _type == Type::VECTOR;
+}
+
+bool Data::isNumber() const
+{
+	return _type == Type::DOUBLE || _type == Type::INT;
+}
+
+string Data::asString() const
+{
+	switch(_type) {
+	case Data::Type::BOOLEAN:
+		{
+			bool value = boost::any_cast<bool>(_data);
+			if (value) {
+				return "true";
+			} else {
+				return "false";
+			}
+		}
+
+	case Data::Type::DATE:
+		return boost::posix_time::to_simple_string
+			(boost::any_cast<boost::posix_time::ptime>(_data));
+
+	case Data::Type::DOUBLE:
+		return boost::lexical_cast<string>(boost::any_cast<double>(_data));
+
+	case Data::Type::INT:
+		return boost::lexical_cast<string>(boost::any_cast<int>(_data));
+
+	case Data::Type::MAP:
+		{
+			string output("{");
+
+			for (const std::pair<string, Data> &data :
+				     boost::any_cast<std::map<string, Data> >(_data)) {
+				output += data.first + " : " + data.second.asString();
+			}
+
+			output += "}";
+
+			return output;
+		}
+
+	case Data::Type::NONE:
+		return "";
+
+	case Data::Type::STRING:
+		return "'" + boost::any_cast<string>(_data) + "'";
+
+	case Data::Type::VECTOR:
+		{
+			string output("[");
+
+			bool filled = false;
+			for (const Data &data : boost::any_cast<std::vector<Data> >(_data)) {
+				output += data.asString() + ",";
+				filled = true;
+			}
+
+			if (filled) {
+				output = output.substr(0, output.size() - 1);
+			}
+
+			output += "]";
+
+			return output;
+		}
+	}
+
+	throw std::runtime_error("Cannot convert type " +
+	                         Data::Type::toString(_type) + " to string");
+}
+
+double Data::asDouble() const
+{
+	switch(_type) {
+	case Data::Type::BOOLEAN:
+		return boost::lexical_cast<double>(boost::any_cast<bool>(_data));
+
+	case Data::Type::DATE:
+		break;
+
+	case Data::Type::DOUBLE:
+		return boost::any_cast<double>(_data);
+
+	case Data::Type::INT:
+		return boost::lexical_cast<double>(boost::any_cast<int>(_data));
+
+	case Data::Type::MAP:
+		break;
+
+	case Data::Type::NONE:
+		break;
+
+	case Data::Type::STRING:
+		break;
+
+	case Data::Type::VECTOR:
+		break;
+	}
+
+	throw std::runtime_error("Cannot convert type " +
+	                         Data::Type::toString(_type) + " to double");
+}
+
+int Data::asInt() const
+{
+	switch(_type) {
+	case Data::Type::BOOLEAN:
+		return boost::lexical_cast<int>(boost::any_cast<bool>(_data));
+
+	case Data::Type::DATE:
+		// TODO: epoch?
+		break;
+
+	case Data::Type::DOUBLE:
+		return boost::lexical_cast<int>(boost::any_cast<double>(_data));
+
+	case Data::Type::INT:
+		return boost::any_cast<int>(_data);
+
+	case Data::Type::MAP:
+		break;
+
+	case Data::Type::NONE:
+		break;
+
+	case Data::Type::STRING:
+		break;
+
+	case Data::Type::VECTOR:
+		break;
+	}
+
+	throw std::runtime_error("Cannot convert type " +
+	                         Data::Type::toString(_type) + " to int");
+}
+
+bool Data::asBool() const
+{
+	switch(_type) {
+	case Data::Type::BOOLEAN:
+		return boost::any_cast<bool>(_data);
+
+	case Data::Type::DATE:
+		break;
+
+	case Data::Type::DOUBLE:
+		break;
+
+	case Data::Type::INT:
+		break;
+
+	case Data::Type::MAP:
+		break;
+
+	case Data::Type::NONE:
+		break;
+
+	case Data::Type::STRING:
+		break;
+
+	case Data::Type::VECTOR:
+		break;
+	}
+
+	throw std::runtime_error("Cannot convert type " +
+	                         Data::Type::toString(_type) + " to boolean");
 }
 
 DATAPLUS_NS_END

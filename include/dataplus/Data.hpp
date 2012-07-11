@@ -21,6 +21,7 @@
 #define __DATAPLUS_DATA_HPP__
 
 #include <functional>
+#include <iostream>
 #include <map>
 #include <string>
 #include <vector>
@@ -73,12 +74,33 @@ public:
 	Data& operator[](const string &key) const;
 	Data& operator[](const int &index) const;
 
+	friend std::ostream& operator<<(std::ostream &os, const Data &data)
+	{
+		os << data.asString();
+		return os;
+	}
+
 	void importData(const string &data, const Encoder &encoder);
 	string exportData(const Decoder &decoder);
 
 	Type::Value type() const;
 	std::size_t size() const;
 	bool empty() const;
+
+	bool isBoolean() const;
+	bool isDate() const;
+	bool isDouble() const;
+	bool isInt() const;
+	bool isMap() const;
+	bool isNone() const;
+	bool isString() const;
+	bool isVector() const;
+	bool isNumber() const;
+
+	string asString() const;
+	double asDouble() const;
+	int asInt() const;
+	bool asBool() const;
 
 	template<class T>
 	void set(const T &data)
